@@ -1,0 +1,7 @@
+http://win-builds.org/doku.php
+
+Install x86_64 to get 64 bit to location on C drive
+
+Install C++ compiler
+
+Add (C:\Ming_64\bin) to environment variables PATH

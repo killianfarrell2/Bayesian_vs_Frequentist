@@ -1,3 +1,14 @@
+import pystan
+model_code = 'parameters {real y;} model {y ~ normal(0,1);}'
+model = pystan.StanModel(model_code=model_code)
+y = model.sampling().extract()['y']
+y.mean()  # with luck the result will be near 0
+
+# Check location of distutils file
+import distutils
+print(distutils.__file__)
+
+
 import pandas as pd
 import numpy as np
 
@@ -16,7 +27,7 @@ random.shuffle(ca_balance)
 data = pd.DataFrame(np.concatenate((ca_balance,targets),axis=1))
 data.columns = ['ca_balance','sale']
 
-import pystan
+
 import matplotlib.pyplot as plt
 X= np.random.normal(5,1,1000)
 # Put data in correct format for stan
