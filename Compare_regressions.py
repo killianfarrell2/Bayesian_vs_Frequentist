@@ -176,23 +176,17 @@ parameters {
        
 }
 
-transformed parameters {
-    
-    vector[N] theta; // combination of intercept and occupation coefficient
-    theta = intercept + occ[X] ;
-  
-}
-
 model {
        //hyper priors
        mu_occ ~ normal(0,0.1);
        tau_occ ~ normal(0,1);
+       intercept ~ normal(0,0.1);
        
        //priors
        occ ~ normal(mu_occ, tau_occ);
        
        //likelihood
-       y ~ bernoulli_logit(theta);
+       y ~ bernoulli_logit(intercept + occ[X]);
      
 }
 """
@@ -204,7 +198,6 @@ stan_model = pystan.StanModel(model_code=my_code)
 fit = stan_model.sampling(data=my_data, iter=2000, chains=4, seed=1,warmup=1000)
 
 # Get summary statistics for parameters
-# Output has 1000 parameters for theta, 1 for each observation
 print(fit)
 # Extract generated samples
 occ = fit.extract()['occ']
