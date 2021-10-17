@@ -5,6 +5,7 @@ import statsmodels.api as sm
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
 import pystan
+import arviz as az
 
 
 # Model 3: Stan Hierarchical Bayesain Model (Occupation codes drawn from same distr)
@@ -70,9 +71,19 @@ model {
        occ ~ normal(mu_occ, sd_occ);
        
        //likelihood
-       y ~ bernoulli_logit(intercept + occ[X]);
-     
+       y ~ bernoulli_logit(intercept + occ[X]);     
 }
+
+generated quantities {
+    
+  vector [n_occ] postpred_pr;
+  
+  for (n in 1:n_occ) {
+    postpred_pr[n] = inv_logit(intercept + occ[n]);   
+  }
+}
+
+
 """
 
 # Create Model - this will help with recompilation issues
@@ -86,4 +97,35 @@ print(fit)
 # Extract generated samples
 occ = fit.extract()['occ']
 
+# Put Posterior draws into a dictionary
+params = fit.extract()
+
 detailed_summary = fit.summary()
+
+
+# visual summary
+fit.plot()
+
+
+fit.traceplot()
+
+fit.sampling()
+
+
+
+ax = az.plot_ppc(idata, data_pairs={"y": "y_predict"})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

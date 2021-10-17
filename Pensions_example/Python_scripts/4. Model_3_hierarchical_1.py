@@ -73,7 +73,18 @@ model {
        y ~ bernoulli_logit(intercept + occ[X]);
      
 }
+
+generated quantities {
+  
+    vector [n_occ] postpred_pr;
+  for (n in 1:n_occ) {
+    postpred_pr[n] = inv_logit(intercept + occ[n_occ]);   
+  }
+   
+}
+
 """
+
 
 # Create Model - this will help with recompilation issues
 stan_model = pystan.StanModel(model_code=my_code)
@@ -87,6 +98,10 @@ print(fit)
 occ = fit.extract()['occ']
 
 detailed_summary = fit.summary()
+
+
+# Put Posterior draws into a dictionary
+params = fit.extract()
 
 
 
