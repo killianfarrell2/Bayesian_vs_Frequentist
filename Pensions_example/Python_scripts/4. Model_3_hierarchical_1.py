@@ -11,7 +11,7 @@ import pystan
 # Set uninformative priors (wide normal distribution)
 
 # Import Sales data
-sales_data = pd.read_csv('C:\\KF_Repo\\Bayesian_vs_Frequentist\\Pensions_example\\Data\\Pension_sales_3.csv') 
+sales_data = pd.read_csv('C:\\KF_Repo\\Bayesian_vs_Frequentist\\Pensions_example\\Data\\Pension_sales.csv') 
 
 X = pd.DataFrame(sales_data['Occupation'].values.reshape(len(sales_data), 1))
 y= sales_data['Sale'].values.reshape(len(sales_data), 1)
@@ -61,10 +61,10 @@ parameters {
 
 model {
        //hyper priors - set a wide group
-       mu_occ ~ normal(0,3);
-       sd_occ ~ normal(0,3);
+       mu_occ ~ normal(0,0.01);
+       sd_occ ~ normal(0,0.01);
        // Set very wide priors for intercept 0 is 50%,-9 is 0%, +9 is 100%
-       intercept ~ normal(0,3);
+       intercept ~ normal(0,0.01);
        
        //priors
        occ ~ normal(mu_occ, sd_occ);

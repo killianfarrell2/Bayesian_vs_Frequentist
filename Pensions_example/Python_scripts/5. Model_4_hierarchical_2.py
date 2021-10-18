@@ -61,11 +61,11 @@ parameters {
 }
 
 model {
-       //hyper priors - set a wide group
-       mu_occ ~ normal(0,3);
-       sd_occ ~ normal(0,3);
+       //hyper priors - set prior to be narrow on mu and tau
+       mu_occ ~ normal(0,0.01);
+       sd_occ ~ normal(0,0.01);
        // Set narrow prior on intercept to be 50% (3 is 95%)
-       intercept ~ normal(3,0.01);
+       intercept ~ normal(0,0.01);
        
        //priors
        occ ~ normal(mu_occ, sd_occ);
