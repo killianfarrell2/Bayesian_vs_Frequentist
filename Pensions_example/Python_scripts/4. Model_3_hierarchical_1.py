@@ -75,16 +75,13 @@ model {
 }
 
 generated quantities {
-  
-    vector [n_occ] postpred_pr;
-  for (n in 1:n_occ) {
-    postpred_pr[n] = inv_logit(intercept + occ[n_occ]);   
-  }
-   
+    vector [n_occ] prob;
+    for (n in 1:n_occ) 
+    prob[n] = inv_logit(intercept + occ[n]);  
+    
 }
 
 """
-
 
 # Create Model - this will help with recompilation issues
 stan_model = pystan.StanModel(model_code=my_code)
@@ -92,18 +89,13 @@ stan_model = pystan.StanModel(model_code=my_code)
 # Call sampling function with data as argument
 fit = stan_model.sampling(data=my_data, iter=2000, chains=4, seed=1,warmup=1000)
 
-# Get summary statistics for parameters
-print(fit)
-# Extract generated samples
-occ = fit.extract()['occ']
-
-detailed_summary = fit.summary()
-
-
 # Put Posterior draws into a dictionary
 params = fit.extract()
 
 
+# Get summary statistics for parameters
+print(fit)
+# Extract generated samples
+prob = fit.extract()['prob']
 
-
-
+detailed_summary = fit.summary()

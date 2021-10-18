@@ -64,8 +64,8 @@ model {
        //hyper priors - set a wide group
        mu_occ ~ normal(0,3);
        sd_occ ~ normal(0,3);
-       // Set narrow prior on intercept to be 50%
-       intercept ~ normal(0,0.01);
+       // Set narrow prior on intercept to be 50% (3 is 95%)
+       intercept ~ normal(3,0.01);
        
        //priors
        occ ~ normal(mu_occ, sd_occ);
@@ -75,12 +75,9 @@ model {
 }
 
 generated quantities {
-    
-  vector [n_occ] postpred_pr;
-  
-  for (n in 1:n_occ) {
-    postpred_pr[n] = inv_logit(intercept + occ[n]);   
-  }
+    vector [n_occ] prob;
+    for (n in 1:n_occ) 
+    prob[n] = inv_logit(intercept + occ[n]); 
 }
 
 
@@ -92,40 +89,19 @@ stan_model = pystan.StanModel(model_code=my_code)
 # Call sampling function with data as argument
 fit = stan_model.sampling(data=my_data, iter=2000, chains=4, seed=1,warmup=1000)
 
-# Get summary statistics for parameters
-print(fit)
-# Extract generated samples
-occ = fit.extract()['occ']
-
 # Put Posterior draws into a dictionary
 params = fit.extract()
+
+# Extract generated samples
+prob = fit.extract()['prob']
+
+# Get summary statistics for parameters
+print(fit)
+
 
 detailed_summary = fit.summary()
 
 
 # visual summary
 fit.plot()
-
-
-fit.traceplot()
-
-fit.sampling()
-
-
-
-ax = az.plot_ppc(idata, data_pairs={"y": "y_predict"})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
