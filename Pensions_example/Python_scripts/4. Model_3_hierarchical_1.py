@@ -11,25 +11,22 @@ import pystan
 # Set uninformative priors (wide normal distribution)
 
 # Import Sales data
-sales_data = pd.read_csv('C:\\KF_Repo\\Bayesian_vs_Frequentist\\Pensions_example\\Data\\Pension_sales.csv') 
+train = pd.read_csv('C:\\KF_Repo\\Bayesian_vs_Frequentist\\Pensions_example\\Data\\Pension_sales_train_1.csv') 
 
-X = pd.DataFrame(sales_data['Occupation'].values.reshape(len(sales_data), 1))
-y= sales_data['Sale'].values.reshape(len(sales_data), 1)
+X_train = pd.DataFrame(train['Occupation'].values.reshape(len(train), 1))
+y_train= train['Sale'].values.reshape(len(train), 1)
 
 # Create occupation reference table
-occupations = pd.DataFrame(np.unique(X.values))
+occupations = pd.DataFrame(np.unique(X_train.values))
 occupations['occ_code'] = np.arange(len(occupations)) + 1
 
 # Map back to X dataframe
-X['occ_code']=X.merge(occupations,how='left').values[:,1]
+X_train['occ_code']=X_train.merge(occupations,how='left').values[:,1]
 
 # Drop original column
-X = X.drop(columns=[0])
+X_train = X_train.drop(columns=[0])
 # Convert back to int
-X['occ_code'] = X['occ_code'].astype(str).astype(int)
-
-# Split into train and test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,stratify=y, random_state=1234)
+X_train['occ_code'] = X_train['occ_code'].astype(str).astype(int)
 
 # Reshape arrays so they can be taken by Stan
 y_train = y_train.reshape(len(y_train),)
@@ -61,10 +58,10 @@ parameters {
 
 model {
        //hyper priors - set a wide group
-       mu_occ ~ normal(0,0.01);
-       sd_occ ~ normal(0,0.01);
+       mu_occ ~ normal(0,10);
+       sd_occ ~ normal(0,10);
        // Set very wide priors for intercept 0 is 50%,-9 is 0%, +9 is 100%
-       intercept ~ normal(0,0.01);
+       intercept ~ normal(0,10);
        
        //priors
        occ ~ normal(mu_occ, sd_occ);
